@@ -22,8 +22,12 @@ CELERY_BROKER_URL = 'amqp://guest:guest@localhost//'
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
 CELERY_ACCEPT_CONTENT = ['json']
-CELERY_RESULT_BACKEND = 'db+sqlite:///results.sqlite'
+CELERY_RESULT_BACKEND = 'redis://pass@127.0.0.1:6379/3'
 CELERY_TASK_SERIALIZER = 'json'
+
+CELERY_DEFAULT_EXCHANGE = 'tasks'
+CELERY_DEFAULT_EXCHANGE_TYPE = 'topic'
+CELERY_DEFAULT_ROUTING_KEY = 'task.default'
 
 
 # Quick-start development settings - unsuitable for production
