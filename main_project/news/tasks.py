@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 from celery import task, shared_task
 import requests
+from news.models import Event
 import time
 from .utils import map_events
 
@@ -71,5 +72,7 @@ def get_events(access_token, venues, coordinates):
     r = requests.get(events_url)
     response = r.json()
     events = map_events(response, coordinates)
+    for event in events:
+        Event.objects.create(**event)
     return events
 

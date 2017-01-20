@@ -11,7 +11,7 @@ def map_events(response, coordinates):
         if events and events_data:
             for event in events_data:
                 event_result = dict()
-                event_result['id'] = event['id']
+                event_result['fb_id'] = event['id']
                 event_result['name'] = event['name']
                 event_result['type'] = event['type']
                 if event.get('cover'):
