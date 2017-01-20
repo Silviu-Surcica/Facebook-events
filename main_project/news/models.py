@@ -19,4 +19,4 @@ class Event(models.Model):
     start_time = models.DateTimeField(default=timezone.now)
     end_time = models.DateTimeField(default=timezone.now)
     category = models.CharField(null=True, default=None, blank=True, max_length=50)
-    stats = models.TextField(default=None, blank=True, null=True)
+    stats = JSONField(default=None)
