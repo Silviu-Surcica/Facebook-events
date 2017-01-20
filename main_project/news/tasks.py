@@ -71,5 +71,5 @@ def get_events(access_token, venues, coordinates):
     r = requests.get(events_url)
     response = r.json()
     events = map_events(response, coordinates)
-    return response
+    return events
 
