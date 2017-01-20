@@ -4,7 +4,9 @@ import math
 def map_events(response, coordinates):
     formatted_events = []
     for venue in response:
-        events = venue.get('events')
+        events = response[venue].get('events')
+        if not events:
+            continue
         events_data = events.get('data')
         if events and events_data:
             for event in events_data:
@@ -17,9 +19,9 @@ def map_events(response, coordinates):
                 if event.get('picture'):
                     event_result['profile_picture'] = event['picture']['data']['url']
                 event_result['description'] = event.get('description')
-                if venue.get('location'):
-                    venue_coordinates = {'latitude': venue['location']['latitude'],
-                                         'longitude': venue['location']['longitude']}
+                if response[venue].get('location'):
+                    venue_coordinates = {'latitude': response[venue]['location']['latitude'],
+                                         'longitude': response[venue]['location']['longitude']}
                     event_result['distance'] = calculate_distance(venue_coordinates, coordinates)
                 event_result['start_time'] = event.get('start_time')
                 event_result['end_time'] = event.get('end_time')
@@ -43,7 +45,8 @@ def calculate_distance(venue_coord, coord):
     rad_lat = to_rad(x1)
     x2 = float(coord['longitude']) - float(venue_coord['longitude'])
     rad_long = to_rad(x2)
-    a = math.sin(rad_lat / 2) ** 2 + math.cos(to_rad(venue_coord['latitude'])) + math.cos(to_rad(coord['latitude'])) * math.sin(rad_long / 2) ** 2
+    a = math.sin(rad_lat / 2) ** 2 + math.cos(to_rad(float(venue_coord['latitude']))) +\
+        math.cos(to_rad(float(coord['latitude']))) * math.sin(rad_long / 2) ** 2
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     d = r * c
 
