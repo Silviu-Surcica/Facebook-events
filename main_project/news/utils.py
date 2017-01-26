@@ -38,16 +38,16 @@ def map_events(response, coordinates):
 
 
 def calculate_distance(venue_coord, coord):
-    def to_rad(x):
-        return x * math.pi / 100
-    r = 6371  # km
-    x1 = float(coord['latitude']) - float(venue_coord['latitude'])
-    rad_lat = to_rad(x1)
-    x2 = float(coord['longitude']) - float(venue_coord['longitude'])
-    rad_long = to_rad(x2)
-    a = math.sin(rad_lat / 2) ** 2 + math.cos(to_rad(float(venue_coord['latitude']))) +\
-        math.cos(to_rad(float(coord['latitude']))) * math.sin(rad_long / 2) ** 2
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    d = r * c
+
+    lat1, lon1 = float(venue_coord['latitude']), float(venue_coord['longitude'])
+    lat2, lon2 = float(coord['latitude']), float(coord['longitude'])
+    radius = 6371 # km
+
+    dlat = math.radians(lat2-lat1)
+    dlon = math.radians(lon2-lon1)
+    a = math.sin(dlat/2) * math.sin(dlat/2) + math.cos(math.radians(lat1)) \
+        * math.cos(math.radians(lat2)) * math.sin(dlon/2) * math.sin(dlon/2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    d = radius * c
 
     return d
