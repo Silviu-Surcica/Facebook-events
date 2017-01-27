@@ -18,3 +18,8 @@ class Event(models.Model):
     end_time = models.DateTimeField(default=timezone.now, null=True, blank=True)
     category = models.CharField(null=True, default=None, blank=True, max_length=50)
     stats = JSONField(default=None)
+
+
+class Venue(models.Model):
+    fb_id = models.CharField(max_length=200)
+    name = models.CharField(max_length=200)
