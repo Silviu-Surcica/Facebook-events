@@ -3,7 +3,6 @@ from celery import task, shared_task
 import requests
 from news.models import Event
 import time
-from .utils import map_events
 
 
 @task
@@ -12,11 +11,11 @@ def add(x, y):
     return x+y
 
 
-@task
+@task(rate_limit='5/s')
 def get_venues(access_token, latitude, longitude):
     id_limit, ids = 50, []
     place_url = 'https://graph.facebook.com/v2.8/search?type=place&q=' \
-                '&center={},{}&fields=id&distance=1000&limit=1000&access_token={}&after='.format(latitude, longitude,
+                '&center={},{}&fields=id&distance=500&limit=1000&access_token={}&after='.format(latitude, longitude,
                                                                                                  access_token)
     r = requests.get(place_url)
     response = r.json()
@@ -71,6 +70,7 @@ def get_events(access_token, venues, coordinates):
         ','.join(venues), ','.join(fields), access_token)
     r = requests.get(events_url)
     response = r.json()
+    from news.utils import map_events
     events = map_events(response, coordinates)
     for event in events:
         Event.objects.create(**event)
