@@ -1,3 +1,7 @@
+from celery import group
+from geopy.distance import VincentyDistance
+from geopy import Point
+from news.tasks import get_venues
 import math
 
 
@@ -51,3 +55,31 @@ def calculate_distance(venue_coord, coord):
     d = radius * c
 
     return d
+
+
+def map_bucharest():
+    starting_point = (44.529723, 25.969094)
+    origin = Point(*starting_point)
+    total_distance = 20  # km
+    destination_points = []
+    for i in range(0, total_distance * 2 + 1):
+        d = float(i)/2
+        new_origin = VincentyDistance(kilometers=d).destination(point=origin, bearing=180)
+        for j in range(0, total_distance * 2 + 6):
+            d = float(j)/2
+            destination = VincentyDistance(kilometers=d).destination(point=new_origin, bearing=90)
+            destination_points.append((destination.latitude, destination.longitude))
+
+    return destination_points
+
+
+def ingest_venues(access_token):
+    coords = map_bucharest()
+    maxim_chunks = 30
+    f = lambda array, n=maxim_chunks: [array[i:i + n] for i in range(0, len(array), n)]
+    grouped_coords = f(coords)
+    for chunk in grouped_coords:
+        lazy_group = group([get_venues.s(access_token, *coordinates) for coordinates in chunk])
+        promise = lazy_group()
+        results = promise.get()
+        print results
