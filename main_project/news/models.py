@@ -7,13 +7,13 @@ from django.db import models
 
 class Event(models.Model):
 
+    venue = models.ForeignKey('news.Venue', null=True, blank=True, default=None, related_name='venues')
     fb_id = models.CharField(max_length=200)
     name = models.CharField(max_length=200)
     type = models.CharField(max_length=200)
     cover_picture = models.URLField(max_length=255, blank=True, null=True, default=None)
     profile_picture = models.URLField(max_length=255, blank=True, null=True, default=None)
     description = models.TextField(null=True, default=None, blank=True)
-    distance = models.CharField(max_length=50, null=True, blank=True)
     start_time = models.DateTimeField(default=timezone.now)
     end_time = models.DateTimeField(default=timezone.now, null=True, blank=True)
     category = models.CharField(null=True, default=None, blank=True, max_length=50)
@@ -21,5 +21,6 @@ class Event(models.Model):
 
 
 class Venue(models.Model):
+
     fb_id = models.CharField(max_length=200)
     name = models.CharField(max_length=200)

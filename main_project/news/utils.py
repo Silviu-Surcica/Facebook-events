@@ -1,11 +1,11 @@
-from celery import group
 from geopy.distance import VincentyDistance
 from geopy import Point
-from news.tasks import get_venues
 import math
 
+from news.models import Venue
 
-def map_events(response, coordinates):
+
+def map_events(response):
     formatted_events = []
     for venue in response:
         events = response[venue].get('events')
@@ -23,10 +23,6 @@ def map_events(response, coordinates):
                 if event.get('picture'):
                     event_result['profile_picture'] = event['picture']['data']['url']
                 event_result['description'] = event.get('description')
-                if response[venue].get('location'):
-                    venue_coordinates = {'latitude': response[venue]['location']['latitude'],
-                                         'longitude': response[venue]['location']['longitude']}
-                    event_result['distance'] = calculate_distance(venue_coordinates, coordinates)
                 event_result['start_time'] = event.get('start_time')
                 event_result['end_time'] = event.get('end_time')
                 event_result['category'] = event.get('category')
@@ -36,6 +32,7 @@ def map_events(response, coordinates):
                     'maybe': event.get('maybe_count'),
                     'noreply': event.get('noreply_count')
                 }
+                event_result['venue'] = venue
                 formatted_events.append(event_result)
 
     return formatted_events
@@ -72,14 +69,3 @@ def map_bucharest():
 
     return destination_points
 
-
-def ingest_venues(access_token):
-    coords = map_bucharest()
-    maxim_chunks = 30
-    f = lambda array, n=maxim_chunks: [array[i:i + n] for i in range(0, len(array), n)]
-    grouped_coords = f(coords)
-    for chunk in grouped_coords:
-        lazy_group = group([get_venues.s(access_token, *coordinates) for coordinates in chunk])
-        promise = lazy_group()
-        results = promise.get()
-        print results
