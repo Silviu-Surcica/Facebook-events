@@ -65,7 +65,7 @@ def get_venues(access_token, latitude, longitude):
             ids.append(tmp)
         after = paging['cursors']['after']
         place_url = 'https://graph.facebook.com/v2.8/search?type=place&q=&center={},{}&fields=id,name&' \
-                    'distance=1000&limit=1000&access_token={}&after={}'.format(latitude, longitude, access_token, after)
+                    'distance=500&limit=1000&access_token={}&after={}'.format(latitude, longitude, access_token, after)
         r = requests.get(place_url)
         response = r.json()
         paging = response.get('paging')

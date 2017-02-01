@@ -1,8 +1,8 @@
 from geopy.distance import VincentyDistance
 from geopy import Point
 import math
-
-from news.models import Venue
+from django.utils.dateparse import parse_datetime
+from django.utils import timezone
 
 
 def map_events(response):
@@ -14,6 +14,9 @@ def map_events(response):
         events_data = events.get('data')
         if events and events_data:
             for event in events_data:
+                start_time = parse_datetime(event.get('start_time'))
+                if start_time < timezone.now():
+                    continue
                 event_result = dict()
                 event_result['fb_id'] = event['id']
                 event_result['name'] = event['name']
